@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['bike']
+
+roboflow:
+  workspace: workspace-tcmrx
+  project: bike-detect-rh71v
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/workspace-tcmrx/bike-detect-rh71v/dataset/1
