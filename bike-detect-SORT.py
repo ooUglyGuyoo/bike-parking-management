@@ -60,53 +60,48 @@ while True:
             box_color = (0, 0, 255)  # Red
             text_color = (0, 0, 255)
         
-        # Draw bounding box and display detection time
-        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), box_color, 3)
-        cv2.putText(frame, f"Bike {bike_id}: {bike_detection_times[bike_id]:.2f} s", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
-        
-        # Calculate extension distance (10% of bounding box height)
-        extension_distance = (y2 - y1) * 0.1
+        if bike_id == 8:
+            # Draw bounding box and display detection time
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), box_color, 3)
+            cv2.putText(frame, f"Bike {bike_id}: {bike_detection_times[bike_id]:.2f} s", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
+            
+            # Calculate extension distance (10% of bounding box height)
+            extension_distance = (y2 - y1) * 0.1
 
-        # Calculate extended points (Handling negative coordinates)
-        top_left_extended_x = int(x1 - extension_distance * ((x1 - vanishing_point[0]) / (y1 - vanishing_point[1])))
-        top_left_extended_y = int(y1 - extension_distance)
-        bottom_left_extended_x = int(x1 - extension_distance * ((x1 - vanishing_point[0]) / (y2 - vanishing_point[1])))
-        bottom_left_extended_y = int(y2 - extension_distance)
-        top_right_extended_x = int(x2 - extension_distance * ((x2 - vanishing_point[0]) / (y1 - vanishing_point[1])))
-        top_right_extended_y = int(y1 - extension_distance)
-        bottom_right_extended_x = int(x2 - extension_distance * ((x2 - vanishing_point[0]) / (y2 - vanishing_point[1])))
-        bottom_right_extended_y = int(y2 - extension_distance)
+            # Calculate extended points (Handling negative coordinates)
+            top_left_extended_x = int(x1 - extension_distance * ((x1 - vanishing_point[0]) / (y1 - vanishing_point[1])))
+            top_left_extended_y = int(y1 - extension_distance)
+            bottom_left_extended_x = int(x1 - extension_distance * ((x1 - vanishing_point[0]) / (y2 - vanishing_point[1])))
+            bottom_left_extended_y = int(y2 - extension_distance)
+            top_right_extended_x = int(x2 - extension_distance * ((x2 - vanishing_point[0]) / (y1 - vanishing_point[1])))
+            top_right_extended_y = int(y1 - extension_distance)
+            bottom_right_extended_x = int(x2 - extension_distance * ((x2 - vanishing_point[0]) / (y2 - vanishing_point[1])))
+            bottom_right_extended_y = int(y2 - extension_distance)
 
-        # Ensure extended points stay within the frame
-        top_left_extended_x = max(0, top_left_extended_x)
-        top_left_extended_y = max(0, top_left_extended_y)
-        bottom_left_extended_x = max(0, bottom_left_extended_x)
-        bottom_left_extended_y = max(0, bottom_left_extended_y)
-        top_right_extended_x = min(width, top_right_extended_x)
-        top_right_extended_y = max(0, top_right_extended_y)
-        bottom_right_extended_x = min(width, bottom_right_extended_x)
-        bottom_right_extended_y = max(0, bottom_right_extended_y)
+            # Ensure extended points stay within the frame
+            top_left_extended_x = max(0, top_left_extended_x)
+            top_left_extended_y = max(0, top_left_extended_y)
+            bottom_left_extended_x = max(0, bottom_left_extended_x)
+            bottom_left_extended_y = max(0, bottom_left_extended_y)
+            top_right_extended_x = min(width, top_right_extended_x)
+            top_right_extended_y = max(0, top_right_extended_y)
+            bottom_right_extended_x = min(width, bottom_right_extended_x)
+            bottom_right_extended_y = max(0, bottom_right_extended_y)
 
-        # Draw the lines connecting the bounding box to the vanishing point
-        cv2.line(frame, (int(x1), int(y1)), (top_left_extended_x, top_left_extended_y), box_color, 2)
-        cv2.line(frame, (int(x2), int(y1)), (top_right_extended_x, top_right_extended_y), box_color, 2)
-        cv2.line(frame, (int(x1), int(y2)), (bottom_left_extended_x, bottom_left_extended_y), box_color, 2)
-        cv2.line(frame, (int(x2), int(y2)), (bottom_right_extended_x, bottom_right_extended_y), box_color, 2)
+            # Draw the lines connecting the bounding box to the vanishing point
+            cv2.line(frame, (int(x1), int(y1)), (top_left_extended_x, top_left_extended_y), box_color, 2)
+            cv2.line(frame, (int(x2), int(y1)), (top_right_extended_x, top_right_extended_y), box_color, 2)
+            cv2.line(frame, (int(x1), int(y2)), (bottom_left_extended_x, bottom_left_extended_y), box_color, 2)
+            cv2.line(frame, (int(x2), int(y2)), (bottom_right_extended_x, bottom_right_extended_y), box_color, 2)
 
-        # Draw the back bounding box
-        cv2.line(frame, (top_right_extended_x, top_right_extended_y), (top_left_extended_x, top_left_extended_y), box_color, 1)
-        cv2.line(frame, (bottom_right_extended_x, bottom_right_extended_y), (top_right_extended_x, top_right_extended_y), box_color, 1)
-        cv2.line(frame, (top_left_extended_x, top_left_extended_y), (bottom_left_extended_x, bottom_left_extended_y), box_color, 1)
-        cv2.line(frame, (bottom_left_extended_x, bottom_left_extended_y), (bottom_right_extended_x, bottom_right_extended_y), box_color, 1)
-        
-        # Calculate vanishing point lines (adjust thickness as needed)
-        # top_left_line = cv2.line(frame, (int(x1), int(y1)), vanishing_point, box_color, 1)
-        # bottom_left_line = cv2.line(frame, (int(x1), int(y2)), vanishing_point, box_color, 1)
-        # top_right_line = cv2.line(frame, (int(x2), int(y1)), vanishing_point, box_color, 1)
-        # bottom_right_line = cv2.line(frame, (int(x2), int(y2)), vanishing_point, box_color, 1)
-                
-        # Update detection time
-        bike_detection_times[bike_id] += 1 / fps
+            # Draw the back bounding box
+            cv2.line(frame, (top_right_extended_x, top_right_extended_y), (top_left_extended_x, top_left_extended_y), box_color, 1)
+            cv2.line(frame, (bottom_right_extended_x, bottom_right_extended_y), (top_right_extended_x, top_right_extended_y), box_color, 1)
+            cv2.line(frame, (top_left_extended_x, top_left_extended_y), (bottom_left_extended_x, bottom_left_extended_y), box_color, 1)
+            cv2.line(frame, (bottom_left_extended_x, bottom_left_extended_y), (bottom_right_extended_x, bottom_right_extended_y), box_color, 1)
+                    
+            # Update detection time
+            bike_detection_times[bike_id] += 1 / fps
 
     # Write the frame to the output video
     out_video.write(frame)
